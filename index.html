@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HP E-Commerce Clone Mockup</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'hp-blue': '#0096D6', // HP's Electric Blue
+                        'hp-dark': '#1a1a1a',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom styles for professional, clean look */
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .container-padding {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        @media (min-width: 640px) {
+            .container-padding {
+                padding-left: 4rem;
+                padding-right: 4rem;
+            }
+        }
+
+        /* Utility for the custom scrollbar on checkout summary */
+        .scroll-y {
+            overflow-y: auto;
+            max-height: 400px;
+        }
+
+        /* Custom transition for page changes */
+        .page-transition {
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        /* HP logo styling (a simple H P using text) */
+        .hp-logo {
+            font-size: 2rem;
+            font-weight: 900;
+            color: #000;
+            line-height: 1;
+        }
+
+        /* Custom shadow for cards */
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-hp-dark">
+
+<!-- Header Navigation -->
+<header class="bg-white sticky top-0 z-50 shadow-md">
+    <div class="max-w-7xl mx-auto container-padding flex items-center justify-between h-16">
+        <!-- Logo -->
+        <button onclick="navigate('home')" class="hp-logo hover:text-hp-blue transition duration-200">
+            HP
+        </button>
+
+        <!-- Main Navigation Links (NOW FUNCTIONAL) -->
+        <nav class="hidden md:flex space-x-8 text-sm font-medium">
+            <button onclick="navigate('laptops')" class="text-gray-600 hover:text-hp-blue transition">Laptops</button>
+            <button onclick="navigate('desktops')" class="text-gray-600 hover:text-hp-blue transition">Desktops</button>
+            <button onclick="navigate('printers')" class="text-gray-600 hover:text-hp-blue transition">Printers</button>
+            <button onclick="navigate('support')" class="text-gray-600 hover:text-hp-blue transition">Support</button>
+        </nav>
+
+        <!-- Icons/Actions -->
+        <div class="flex items-center space-x-4">
+            <button class="text-gray-600 hover:text-hp-blue transition" aria-label="Search">
+                <!-- Search Icon (Lucide/SVG fallback) -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            </button>
+            <button onclick="navigate('cart')" class="text-gray-600 hover:text-hp-blue transition relative" aria-label="Cart">
+                <!-- Shopping Cart Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 12.08a2 2 0 0 0 2 1.92h9.72a2 2 0 0 0 2-1.92L23 6H6"/></svg>
+                <span id="cart-count" class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center opacity-0 transition-opacity">0</span>
+            </button>
+
+            <!-- Login Button -->
+            <button id="login-button" onclick="navigate('login')" class="text-gray-600 hover:text-hp-blue transition" aria-label="Sign In">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+
+            <!-- Profile Dropdown (hidden) -->
+            <div id="profile-dropdown" class="relative hidden">
+                <button onclick="toggleProfileMenu()" class="text-hp-blue transition" aria-label="Profile">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" class="text-hp-blue" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </button>
+                <!-- Dropdown Menu -->
+                <div id="profile-menu" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-xl z-50 border">
+                    <div class="p-4 border-b">
+                        <p class="text-sm font-semibold text-hp-dark">Signed in as:</p>
+                        <p class="text-sm text-gray-600 truncate" id="profile-email">Sharu@yopmail.com</p>
+                    </div>
+                    <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">My Account</a>
+                    <a href="#" class="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-100">Order History</a>
+                    <a href="#" onclick="logout(event)" class="block px-4 py-3 text-sm text-red-600 hover:bg-gray-100 rounded-b-xl">Sign Out</a>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</header>
+
+<!-- Main Content Area -->
+<main class="flex-grow max-w-7xl mx-auto w-full container-padding pt-8 pb-16">
+    <!-- Message Box for alerts -->
+    <div id="message-box" class="fixed top-20 right-4 p-4 rounded-lg shadow-lg text-white transition-opacity duration-300 opacity-0 z-[60]" role="alert"></div>
+
+    <!-- Pages Container -->
+    <div id="pages-container">
+
+        <!-- Page 0: Login Page (DEFAULT LANDING PAGE) -->
+        <section id="login-page" class="page-transition hidden" data-page="login">
+            <div class="flex items-center justify-center min-h-[70vh]">
+                <div class="w-full max-w-md bg-white p-8 md:p-10 rounded-xl shadow-xl border-t-4 border-hp-blue">
+                    <h1 class="text-3xl font-extrabold text-hp-dark mb-2 text-center">Sign In to HP.com</h1>
+                    <p class="text-center text-gray-500 mb-8">Access faster checkout and exclusive deals.</p>
+
+                    <form id="login-form" class="space-y-6">
+                        <div class="space-y-2">
+                            <label for="login-username" class="text-sm font-medium text-gray-700">Email Address</label>
+                            <input type="email" id="login-username" placeholder="Sharu@yopmail.com" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                        </div>
+                        <div class="space-y-2">
+                            <label for="login-password" class="text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" id="login-password" placeholder="Sharu@123" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                        </div>
+
+                        <div class="flex justify-between items-center text-sm">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="remember-me" class="h-4 w-4 text-hp-blue border-gray-300 rounded focus:ring-hp-blue">
+                                <label for="remember-me" class="ml-2 text-gray-700">Remember me</label>
+                            </div>
+                            <a href="#" class="text-hp-blue hover:underline">Forgot Password?</a>
+                        </div>
+
+                        <button type="submit" class="w-full bg-hp-blue text-white py-3 rounded-full font-bold text-lg hover:bg-hp-dark transition duration-300 shadow-lg shadow-hp-blue/30">
+                            Sign In
+                        </button>
+                    </form>
+
+                    <div class="mt-8 text-center text-sm">
+                        <p class="text-gray-600">Don't have an account? <a href="#" class="text-hp-blue font-semibold hover:underline">Create an account</a></p>
+                    </div>
+
+                    <p class="mt-4 text-xs text-center text-gray-400">
+                        **Use Sharu@yopmail.com and Sharu@123 to log in.**
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 1: Home/Product Listing (Featured) -->
+        <section id="home-page" class="page-transition hidden" data-page="home">
+            <div class="text-center mb-10">
+                <h1 class="text-4xl md:text-5xl font-extrabold mb-2">The HP Collection: Inspired Technology</h1>
+                <p class="text-lg text-gray-600">Power, precision, and elegance designed for the modern creator.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Product Card 1: HP Spectre x360 -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/000000/FFFFFF?text=Spectre+x360+14" onerror="this.src='https://placehold.co/600x400/000000/FFFFFF?text=Spectre+x360+14';" class="rounded-lg mb-4 w-full h-auto" alt="HP Spectre x360">
+                    <h2 class="text-xl font-bold text-hp-dark">HP Spectre x360 14"</h2>
+                    <p class="text-sm text-gray-500 mb-4">The ultimate 2-in-1 convertible PC with OLED display.</p>
+                    <ul class="text-sm text-gray-700 list-disc pl-5 mb-4 space-y-1">
+                        <li>Intel® Core™ Ultra 7</li>
+                        <li>16 GB RAM / 512 GB SSD</li>
+                    </ul>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$1,499.99</span>
+                        <button onclick="loadProductPage('spectre-14')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            Customize & Buy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Card 2: HP Envy Desktop -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/f0f0f0/333333?text=Envy+Desktop+TE02" onerror="this.src='https://placehold.co/600x400/f0f0f0/333333?text=Envy+Desktop+TE02';" class="rounded-lg mb-4 w-full h-auto" alt="HP Envy Desktop">
+                    <h2 class="text-xl font-bold text-hp-dark">HP Envy Desktop TE02</h2>
+                    <p class="text-sm text-gray-500 mb-4">Unleash powerful performance for demanding creative tasks.</p>
+                    <ul class="text-sm text-gray-700 list-disc pl-5 mb-4 space-y-1">
+                        <li>AMD Ryzen™ 7 Processor</li>
+                        <li>32 GB RAM / 1 TB SSD</li>
+                    </ul>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$1,199.99</span>
+                        <button onclick="loadProductPage('envy-desktop')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            Customize & Buy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Product Card 3: HP OfficeJet Pro -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/666666/FFFFFF?text=OfficeJet+Pro+9020" onerror="this.src='https://placehold.co/600x400/666666/FFFFFF?text=OfficeJet+Pro+9020';" class="rounded-lg mb-4 w-full h-auto" alt="HP OfficeJet Pro">
+                    <h2 class="text-xl font-bold text-hp-dark">OfficeJet Pro 9020</h2>
+                    <p class="text-sm text-gray-500 mb-4">Fast, professional-quality color for your business.</p>
+                    <ul class="text-sm text-gray-700 list-disc pl-5 mb-4 space-y-1">
+                        <li>All-in-One: Print, Scan, Copy</li>
+                        <li>Instant Ink Ready</li>
+                    </ul>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$429.99</span>
+                        <button onclick="loadProductPage('officejet-9020')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: Laptops Page -->
+        <section id="laptops-page" class="page-transition hidden" data-page="laptops">
+            <h1 class="text-4xl font-extrabold mb-10 text-center">Laptops for Home & Business</h1>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Spectre 14 -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/000000/FFFFFF?text=Spectre+x360+14" onerror="this.src='https://placehold.co/600x400/000000/FFFFFF?text=Spectre+x360+14';" class="rounded-lg mb-4 w-full h-auto" alt="HP Spectre x360 14">
+                    <h2 class="text-xl font-bold text-hp-dark">HP Spectre x360 14"</h2>
+                    <p class="text-sm text-gray-500 mb-4">The ultimate 2-in-1 convertible PC with OLED display.</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$1,499.99</span>
+                        <button onclick="loadProductPage('spectre-14')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            Customize & Buy
+                        </button>
+                    </div>
+                </div>
+                <!-- Omen 16 -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/FF0000/FFFFFF?text=OMEN+16+Gaming" onerror="this.src='https://placehold.co/600x400/FF0000/FFFFFF?text=OMEN+16+Gaming';" class="rounded-lg mb-4 w-full h-auto" alt="OMEN 16 Gaming Laptop">
+                    <h2 class="text-xl font-bold text-hp-dark">OMEN 16 Gaming Laptop</h2>
+                    <p class="text-sm text-gray-500 mb-4">Pure gaming power with a high-refresh-rate display.</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$1,699.99</span>
+                        <button onclick="loadProductPage('omen-16')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            Customize & Buy
+                        </button>
+                    </div>
+                </div>
+                <!-- Pavilion 15 -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/0096D6/FFFFFF?text=Pavilion+15" onerror="this.src='https://placehold.co/600x400/0096D6/FFFFFF?text=Pavilion+15';" class="rounded-lg mb-4 w-full h-auto" alt="HP Pavilion 15">
+                    <h2 class="text-xl font-bold text-hp-dark">HP Pavilion 15"</h2>
+                    <p class="text-sm text-gray-500 mb-4">All-around performance for work, school, and play.</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$799.99</span>
+                        <button onclick="loadProductPage('pavilion-15')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            Customize & Buy
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: Desktops Page -->
+        <section id="desktops-page" class="page-transition hidden" data-page="desktops">
+            <h1 class="text-4xl font-extrabold mb-10 text-center">Desktops & All-in-Ones</h1>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Envy Desktop -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/f0f0f0/333333?text=Envy+Desktop+TE02" onerror="this.src='https://placehold.co/600x400/f0f0f0/333333?text=Envy+Desktop+TE02';" class="rounded-lg mb-4 w-full h-auto" alt="HP Envy Desktop TE02">
+                    <h2 class="text-xl font-bold text-hp-dark">HP Envy Desktop TE02</h2>
+                    <p class="text-sm text-gray-500 mb-4">Unleash powerful performance for demanding creative tasks.</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$1,199.99</span>
+                        <button onclick="loadProductPage('envy-desktop')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            Customize & Buy
+                        </button>
+                    </div>
+                </div>
+                <!-- OMEN Tower -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/000000/FF0000?text=OMEN+40L+Tower" onerror="this.src='https://placehold.co/600x400/000000/FF0000?text=OMEN+40L+Tower';" class="rounded-lg mb-4 w-full h-auto" alt="OMEN 40L Tower">
+                    <h2 class="text-xl font-bold text-hp-dark">OMEN 40L Gaming Tower</h2>
+                    <p class="text-sm text-gray-500 mb-4">The ultimate gaming PC with cutting-edge components.</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$2,199.99</span>
+                        <button onclick="loadProductPage('omen-tower')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            Customize & Buy
+                        </button>
+                    </div>
+                </div>
+                <!-- All-in-One 27 -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/EEEEEE/000000?text=HP+All-in-One+27" onerror="this.src='https://placehold.co/600x400/EEEEEE/000000?text=HP+All-in-One+27';" class="rounded-lg mb-4 w-full h-auto" alt="HP All-in-One 27">
+                    <h2 class="text-xl font-bold text-hp-dark">HP All-in-One 27"</h2>
+                    <p class="text-sm text-gray-500 mb-4">A sleek, space-saving design with a vibrant touch display.</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$949.99</span>
+                        <button onclick="loadProductPage('aio-27')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            Customize & Buy
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: Printers Page -->
+        <section id="printers-page" class="page-transition hidden" data-page="printers">
+            <h1 class="text-4xl font-extrabold mb-10 text-center">Printers for Home & Office</h1>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- OfficeJet Pro 9020 -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/666666/FFFFFF?text=OfficeJet+Pro+9020" onerror="this.src='https://placehold.co/600x400/666666/FFFFFF?text=OfficeJet+Pro+9020';" class="rounded-lg mb-4 w-full h-auto" alt="HP OfficeJet Pro 9020">
+                    <h2 class="text-xl font-bold text-hp-dark">OfficeJet Pro 9020</h2>
+                    <p class="text-sm text-gray-500 mb-4">Fast, professional-quality color for your business.</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$429.99</span>
+                        <button onclick="loadProductPage('officejet-9020')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                <!-- LaserJet Pro -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/333333/FFFFFF?text=LaserJet+Pro+4001" onerror="this.src='https://placehold.co/600x400/333333/FFFFFF?text=LaserJet+Pro+4001';" class="rounded-lg mb-4 w-full h-auto" alt="HP LaserJet Pro 4001">
+                    <h2 class="text-xl font-bold text-hp-dark">LaserJet Pro 4001n</h2>
+                    <p class="text-sm text-gray-500 mb-4">High-speed monochrome laser printing for workgroups.</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$299.99</span>
+                        <button onclick="loadProductPage('laserjet-pro')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+                <!-- Envy Inspire -->
+                <div class="bg-white p-6 rounded-xl shadow-lg card-shadow hover:shadow-xl transition duration-300">
+                    <img src="https://placehold.co/600x400/8A7967/FFFFFF?text=Envy+Inspire+7955e" onerror="this.src='https://placehold.co/600x400/8A7967/FFFFFF?text=Envy+Inspire+7955e';" class="rounded-lg mb-4 w-full h-auto" alt="HP Envy Inspire 7955e">
+                    <h2 class="text-xl font-bold text-hp-dark">Envy Inspire 7955e</h2>
+                    <p class="text-sm text-gray-500 mb-4">Perfect all-in-one for home, photos, and creative projects.</p>
+                    <div class="flex items-end justify-between">
+                        <span class="text-2xl font-extrabold text-hp-blue">$229.99</span>
+                        <button onclick="loadProductPage('envy-inspire')" class="bg-hp-blue text-white py-2 px-4 rounded-full font-semibold hover:bg-hp-dark transition duration-300 shadow-md">
+                            View Details
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: Support Page -->
+        <section id="support-page" class="page-transition hidden" data-page="support">
+            <h1 class="text-4xl font-extrabold mb-10 text-center">HP Customer Support</h1>
+            <div class="bg-white p-10 rounded-xl shadow-lg max-w-3xl mx-auto">
+                <h2 class="text-2xl font-bold text-center text-hp-dark mb-6">How can we help you today?</h2>
+                <div class="relative mb-8">
+                    <input type="text" placeholder="Search by product name or serial number" class="w-full p-4 border border-gray-300 rounded-full focus:ring-hp-blue focus:border-hp-blue">
+                    <button class="absolute right-2 top-1/2 -translate-y-1/2 bg-hp-blue text-white p-3 rounded-full hover:bg-hp-dark transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                    </button>
+                </div>
+                <div class="grid md:grid-cols-3 gap-6 text-center">
+                    <div class="bg-gray-50 p-6 rounded-lg hover:shadow-md transition">
+                        <h3 class="font-semibold text-hp-blue mb-2">Software & Drivers</h3>
+                        <p class="text-sm text-gray-600">Find the latest software and drivers for your HP products.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg hover:shadow-md transition">
+                        <h3 class="font-semibold text-hp-blue mb-2">Troubleshooting</h3>
+                        <p class="text-sm text-gray-600">Diagnose and solve problems with your devices.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg hover:shadow-md transition">
+                        <h3 class="font-semibold text-hp-blue mb-2">Contact Us</h3>
+                        <p class="text-sm text-gray-600">Chat with an agent or find warranty information.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 2: Product Detail & Customization (NOW DYNAMIC) -->
+        <section id="product-page" class="page-transition hidden" data-page="product">
+            <button onclick="window.history.back()" class="text-hp-blue hover:underline mb-6 flex items-center text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-1"><path d="m15 18-6-6 6-6"/></svg>
+                Back
+            </button>
+
+            <div class="grid lg:grid-cols-3 gap-8 bg-white p-6 md:p-10 rounded-xl shadow-xl">
+                <!-- Product Image/Gallery (Col 1) -->
+                <div class="lg:col-span-2">
+                    <div class="h-80 md:h-96 bg-gray-100 rounded-xl flex items-center justify-center p-4 mb-6">
+                        <!-- DYNAMIC -->
+                        <img id="product-image" src="https://placehold.co/800x500/000000/FFFFFF?text=HP+SPECTRE+X360+PREMIUM" onerror="this.src='https://placehold.co/800x500/000000/FFFFFF?text=HP+SPECTRE+X360+PREMIUM';" class="max-h-full max-w-full object-contain" alt="Product Image">
+                    </div>
+
+                    <!-- Product Highlights -->
+                    <div class="space-y-6">
+                        <!-- DYNAMIC -->
+                        <h2 id="product-name" class="text-3xl font-bold text-hp-dark">HP Spectre x360 14" (Simulated CTO)</h2>
+                        <p id="product-description" class="text-gray-600">Configure your dream machine. The Spectre combines the flexibility of a tablet with the power of a flagship laptop, built with premium craftsmanship and the latest AI technology.</p>
+
+                        <!-- Key Features -->
+                        <!-- DYNAMIC -->
+                        <div id="product-features-container" class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center border-t border-b py-4">
+                            <div class="p-2">
+                                <p class="font-bold text-lg text-hp-blue">3K</p>
+                                <p class="text-xs text-gray-500">OLED Display</p>
+                            </div>
+                            <div class="p-2">
+                                <p class="font-bold text-lg text-hp-blue">17 hrs</p>
+                                <p class="text-xs text-gray-500">Battery Life</p>
+                            </div>
+                            <div class="p-2">
+                                <p class="font-bold text-lg text-hp-blue">AI</p>
+                                <p class="text-xs text-gray-500">Intel Core Ultra</p>
+                            </div>
+                            <div class="p-2">
+                                <p class="font-bold text-lg text-hp-blue">~3 lbs</p>
+                                <p class="text-xs text-gray-500">Starting Weight</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Configuration/Buy Column (Col 2) -->
+                <div class="lg:col-span-1 border-t lg:border-t-0 lg:border-l lg:pl-8 pt-6 lg:pt-0">
+                    <div class="sticky top-20">
+                        <h3 class="text-2xl font-extrabold mb-4">Price & Options</h3>
+
+                        <!-- Price Display (DYNAMIC) -->
+                        <div class="text-4xl font-black text-hp-dark mb-6" id="final-price">$1,499.99</div>
+
+                        <!-- Configuration Options (DYNAMIC VISIBILITY) -->
+                        <div id="product-config-section" class="space-y-6">
+
+                            <!-- Color Option -->
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">1. Color</label>
+                                <div class="flex space-x-4">
+                                    <button data-option="color" data-value="Nightfall Black" data-price="0" class="config-btn border-2 border-hp-blue p-2 rounded-lg text-xs font-medium bg-black text-white hover:ring-2 hover:ring-hp-blue">Black</button>
+                                    <button data-option="color" data-value="Natural Silver" data-price="0" class="config-btn border-2 border-gray-300 p-2 rounded-lg text-xs font-medium bg-gray-200 text-hp-dark hover:ring-2 hover:ring-hp-blue">Silver</button>
+                                    <button data-option="color" data-value="Aero Blue" data-price="50" class="config-btn border-2 border-gray-300 p-2 rounded-lg text-xs font-medium bg-hp-blue/10 text-hp-blue hover:ring-2 hover:ring-hp-blue">+ $50 Blue</button>
+                                </div>
+                            </div>
+
+                            <!-- RAM Option -->
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">2. Memory (RAM)</label>
+                                <div class="flex space-x-4">
+                                    <button data-option="ram" data-value="16GB" data-price="0" class="config-btn border-2 border-hp-blue p-2 rounded-lg text-xs font-medium bg-white text-hp-dark hover:ring-2 hover:ring-hp-blue">16 GB</button>
+                                    <button data-option="ram" data-value="32GB" data-price="250" class="config-btn border-2 border-gray-300 p-2 rounded-lg text-xs font-medium bg-white text-hp-dark hover:ring-2 hover:ring-hp-blue">+ $250 32 GB</button>
+                                </div>
+                            </div>
+
+                            <!-- Storage Option -->
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">3. Storage (SSD)</label>
+                                <div class="flex space-x-4">
+                                    <button data-option="storage" data-value="512GB" data-price="0" class="config-btn border-2 border-hp-blue p-2 rounded-lg text-xs font-medium bg-white text-hp-dark hover:ring-2 hover:ring-hp-blue">512 GB</button>
+                                    <button data-option="storage" data-value="1TB" data-price="150" class="config-btn border-2 border-gray-300 p-2 rounded-lg text-xs font-medium bg-white text-hp-dark hover:ring-2 hover:ring-hp-blue">+ $150 1 TB</button>
+                                    <button data-option="storage" data-value="2TB" data-price="350" class="config-btn border-2 border-gray-300 p-2 rounded-lg text-xs font-medium bg-white text-hp-dark hover:ring-2 hover:ring-hp-blue">+ $350 2 TB</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add to Cart Button -->
+                        <button id="add-to-cart-btn" onclick="addToCart()" class="w-full mt-8 bg-hp-blue text-white py-3 rounded-full font-bold text-lg hover:bg-hp-dark transition duration-300 shadow-xl shadow-hp-blue/30">
+                            Add to Cart
+                        </button>
+                        <p class="text-center text-xs text-gray-500 mt-2">Ships in 3-5 Business Days</p>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 3: Cart / Checkout Step 1 -->
+        <section id="cart-page" class="page-transition hidden" data-page="cart">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-extrabold text-hp-dark">Your Shopping Cart</h1>
+            </div>
+
+            <div id="cart-empty-state" class="text-center p-12 bg-white rounded-xl shadow-lg border-2 border-dashed border-gray-200 hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-4"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 12.08a2 2 0 0 0 2 1.92h9.72a2 2 0 0 0 2-1.92L23 6H6"/></svg>
+                <p class="text-lg text-gray-500">Your cart is currently empty.</p>
+                <button onclick="navigate('home')" class="mt-4 text-hp-blue hover:underline font-medium">Continue Shopping</button>
+            </div>
+
+            <div id="cart-content" class="grid lg:grid-cols-3 gap-8 hidden">
+                <!-- Cart Items (Col 1 & 2) -->
+                <div class="lg:col-span-2 space-y-4" id="cart-items-list">
+                    <!-- Cart Item populated by JS -->
+                </div>
+
+                <!-- Cart Summary (Col 3) -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white p-6 rounded-xl shadow-lg sticky top-20">
+                        <h3 class="text-xl font-bold mb-4 border-b pb-3">Order Summary</h3>
+
+                        <div class="space-y-2 text-sm text-gray-700">
+                            <div class="flex justify-between">
+                                <span>Subtotal:</span>
+                                <span id="summary-subtotal">$0.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Shipping (Standard):</span>
+                                <span class="text-green-600">FREE</span>
+                            </div>
+                            <div class="flex justify-between border-t pt-2">
+                                <span class="font-bold text-hp-dark text-lg">Estimated Tax (8%):</span>
+                                <span class="font-bold text-hp-dark text-lg" id="summary-tax">$0.00</span>
+                            </div>
+                            <div class="flex justify-between border-t border-hp-dark pt-3">
+                                <span class="font-extrabold text-hp-dark text-xl">Order Total:</span>
+                                <span class="font-extrabold text-hp-blue text-xl" id="summary-total">$0.00</span>
+                            </div>
+                        </div>
+
+                        <button onclick="startCheckout()" class="w-full mt-6 bg-hp-blue text-white py-3 rounded-full font-bold text-lg hover:bg-hp-dark transition duration-300">
+                            Proceed to Checkout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 4: Checkout Flow (Shipping, Payment, Review) -->
+        <section id="checkout-page" class="page-transition hidden" data-page="checkout">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-extrabold text-hp-dark">Secure Checkout</h1>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Checkout Steps (Col 1 & 2) -->
+                <div class="lg:col-span-2 space-y-6">
+                    <!-- Step Navigation -->
+                    <div class="flex justify-between text-sm font-medium mb-4">
+                        <button id="step-shipping-btn" class="text-hp-blue cursor-default">1. Shipping</button>
+                        <span class="text-gray-400">→</span>
+                        <button id="step-payment-btn" class="text-gray-400">2. Payment</button>
+                        <span class="text-gray-400">→</span>
+                        <button id="step-review-btn" class="text-gray-400">3. Review</button>
+                    </div>
+
+                    <!-- Step 1: Shipping Form -->
+                    <div id="checkout-shipping" class="checkout-step bg-white p-6 rounded-xl shadow-lg">
+                        <h2 class="text-2xl font-bold mb-4">Shipping Information</h2>
+                        <form id="shipping-form" class="space-y-4">
+                            <input type="text" id="ship-name" placeholder="Full Name" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                            <input type="email" id="ship-email" placeholder="Email Address" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                            <input type="tel" id="ship-phone" placeholder="Phone Number (Optional)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                            <input type="text" id="ship-address1" placeholder="Address Line 1" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                            <input type="text" id="ship-address2" placeholder="Address Line 2 (Apt, Suite, etc.)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <input type="text" id="ship-city" placeholder="City" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                                <select id="ship-state" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue bg-white">
+                                    <option value="">State / Province</option>
+                                    <option value="CA">California</option>
+                                    <option value="NY">New York</option>
+                                    <option value="TX">Texas</option>
+                                    <option value="FL">Florida</option>
+                                </select>
+                                <input type="text" id="ship-zip" placeholder="Zip Code" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                            </div>
+
+                            <button type="submit" class="w-full bg-hp-blue text-white py-3 rounded-full font-bold text-lg hover:bg-hp-dark transition duration-300 mt-4">
+                                Continue to Payment
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Step 2: Payment Form (Hidden) -->
+                    <div id="checkout-payment" class="checkout-step bg-white p-6 rounded-xl shadow-lg hidden">
+                        <h2 class="text-2xl font-bold mb-4">Payment Method</h2>
+                        <form id="payment-form" class="space-y-4">
+                            <p class="text-sm text-gray-500 mb-4">Secure payment powered by HP Financing.</p>
+
+                            <label class="block text-sm font-semibold mb-2">Credit Card Details</label>
+                            <input type="text" id="card-number" placeholder="Card Number (xxxx xxxx xxxx xxxx)" required minlength="16" maxlength="16" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                            <input type="text" id="card-name" placeholder="Name on Card" required class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <input type="text" id="card-expiry" placeholder="MM/YY" required minlength="5" maxlength="5" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                                <input type="text" id="card-cvc" placeholder="CVC" required minlength="3" maxlength="4" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-hp-blue focus:border-hp-blue">
+                            </div>
+
+                            <div class="flex items-center space-x-2 pt-2">
+                                <input type="checkbox" id="save-card" class="h-4 w-4 text-hp-blue border-gray-300 rounded focus:ring-hp-blue">
+                                <label for="save-card" class="text-sm text-gray-700">Save card for future purchases</label>
+                            </div>
+
+                            <button type="submit" class="w-full bg-hp-blue text-white py-3 rounded-full font-bold text-lg hover:bg-hp-dark transition duration-300 mt-4">
+                                Review Order
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Step 3: Review Order (Hidden) -->
+                    <div id="checkout-review" class="checkout-step bg-white p-6 rounded-xl shadow-lg hidden">
+                        <h2 class="text-2xl font-bold mb-4">Review and Place Order</h2>
+
+                        <div class="space-y-6">
+                            <!-- Shipping Review -->
+                            <div>
+                                <h3 class="text-lg font-semibold border-b pb-2 mb-2 flex justify-between items-center">
+                                    Shipping To
+                                    <button onclick="changeCheckoutStep('shipping')" class="text-hp-blue text-sm font-medium hover:underline">Change</button>
+                                </h3>
+                                <div id="review-shipping-details" class="text-gray-700 text-sm space-y-1">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+
+                            <!-- Payment Review -->
+                            <div>
+                                <h3 class="text-lg font-semibold border-b pb-2 mb-2 flex justify-between items-center">
+                                    Payment Method
+                                    <button onclick="changeCheckoutStep('payment')" class="text-hp-blue text-sm font-medium hover:underline">Change</button>
+                                </h3>
+                                <p id="review-payment-details" class="text-gray-700 text-sm">
+                                    <!-- Populated by JS -->
+                                </p>
+                            </div>
+
+                            <!-- Items Review -->
+                            <div>
+                                <h3 class="text-lg font-semibold border-b pb-2 mb-2">Items in Order</h3>
+                                <div id="review-items-list" class="space-y-3 text-sm scroll-y pr-2">
+                                    <!-- Populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="submitOrder()" class="w-full bg-green-600 text-white py-3 rounded-full font-bold text-lg hover:bg-green-700 transition duration-300 mt-6 shadow-lg shadow-green-600/30">
+                            Place Order (Final Step)
+                        </button>
+                        <p class="text-center text-xs text-gray-500 mt-2">By placing your order, you agree to HP's Terms and Conditions.</p>
+                    </div>
+                </div>
+
+                <!-- Order Summary (Col 3 - Sticky) -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white p-6 rounded-xl shadow-lg sticky top-20">
+                        <h3 class="text-xl font-bold mb-4 border-b pb-3">Final Order Summary</h3>
+
+                        <div class="space-y-2 text-sm text-gray-700">
+                            <div class="flex justify-between">
+                                <span>Subtotal:</span>
+                                <span id="review-subtotal">$0.00</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Shipping (Standard):</span>
+                                <span class="text-green-600">FREE</span>
+                            </div>
+                            <div class="flex justify-between border-t pt-2">
+                                <span class="font-bold text-hp-dark text-lg">Estimated Tax (8%):</span>
+                                <span class="font-bold text-hp-dark text-lg" id="review-tax">$0.00</span>
+                            </div>
+                            <div class="flex justify-between border-t border-hp-dark pt-3">
+                                <span class="font-extrabold text-hp-dark text-xl">Total Due:</span>
+                                <span class="font-extrabold text-hp-blue text-xl" id="review-total">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Page 5: Order Confirmation -->
+        <section id="confirmation-page" class="page-transition hidden" data-page="confirmation">
+            <div class="max-w-xl mx-auto text-center bg-white p-10 rounded-xl shadow-2xl border-t-8 border-hp-blue">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#0096D6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-6"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>
+                <h1 class="text-4xl font-extrabold text-hp-dark mb-4">Order Placed Successfully!</h1>
+                <p class="text-lg text-gray-700 mb-6">Your order number is <span class="font-mono font-semibold text-hp-blue" id="order-number">HP-US-10294857</span>.</p>
+                <p class="text-gray-600 mb-8">A detailed confirmation email has been sent to the address provided. You can track your order using your HP account or the link in the email.</p>
+                <div class="space-y-3">
+                    <button onclick="navigate('home', true)" class="w-full md:w-auto bg-hp-blue text-white py-3 px-8 rounded-full font-bold hover:bg-hp-dark transition duration-300">
+                        Continue Shopping
+                    </button>
+                    <p class="text-sm text-gray-500">
+                        Estimated Delivery: 5-7 business days
+                    </p>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<!-- Footer -->
+<footer class="bg-hp-dark text-white mt-auto">
+    <div class="max-w-7xl mx-auto container-padding py-10 text-sm">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+            <div>
+                <h4 class="font-bold mb-3">Shop & Learn</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" onclick="navigate('laptops')" class="hover:text-hp-blue transition">Laptops</a></li>
+                    <li><a href="#" onclick="navigate('desktops')" class="hover:text-hp-blue transition">Desktops</a></li>
+                    <li><a href="#" onclick="navigate('printers')" class="hover:text-hp-blue transition">Printers</a></li>
+                    <li><a href="#" class="hover:text-hp-blue transition">Accessories</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-3">HP Store</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" class="hover:text-hp-blue transition">Weekly Deals</a></li>
+                    <li><a href="#" class="hover:text-hp-blue transition">Order Status</a></li>
+                    <li><a href="#" class="hover:text-hp-blue transition">Returns & Exchanges</a></li>
+                    <li><a href="#" class="hover:text-hp-blue transition">Financing</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-3">Support</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" onclick="navigate('support')" class="hover:text-hp-blue transition">Download Drivers</a></li>
+                    <li><a href="#" onclick="navigate('support')" class="hover:text-hp-blue transition">Contact Us</a></li>
+                    <li><a href="#" class="hover:text-hp-blue transition">Check Warranty</a></li>
+                    <li><a href="#" class="hover:text-hp-blue transition">Community Forum</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold mb-3">About HP</h4>
+                <ul class="space-y-2 text-gray-300">
+                    <li><a href="#" class="hover:text-hp-blue transition">Sustainable Impact</a></li>
+                    <li><a href="#" class="hover:text-hp-blue transition">Careers</a></li>
+                    <li><a href="#" class="hover:text-hp-blue transition">Investor Relations</a></li>
+                    <li><a href="#" class="hover:text-hp-blue transition">Newsroom</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="text-center border-t border-gray-700 pt-6 mt-4">
+            <p>&copy; 2024 HP Development Company, L.P. The HP Store Mockup. Terms of Use | Privacy Statement</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // --- Global State and Constants ---
+    const TAX_RATE = 0.08; // 8% sales tax
+
+    // --- Authentication Constants ---
+    const USERNAME = "Sharu@yopmail.com";
+    const PASSWORD = "Sharu@123";
+
+    // --- NEW: Product Database ---
+    const allProducts = {
+        // Laptops
+        'spectre-14': {
+            name: "HP Spectre x360 14\"",
+            price: 1499.99,
+            image: "https://placehold.co/800x500/000000/FFFFFF?text=Spectre+x360+14",
+            description: "The ultimate 2-in-1 convertible PC with OLED display, built with premium craftsmanship and the latest AI technology.",
+            features: ["3K / OLED Display", "17 hrs / Battery Life", "AI / Intel Core Ultra", "~3 lbs / Starting Weight"],
+            type: 'laptop'
+        },
+        'omen-16': {
+            name: "OMEN 16 Gaming Laptop",
+            price: 1699.99,
+            image: "https://placehold.co/800x500/FF0000/FFFFFF?text=OMEN+16+Gaming",
+            description: "Pure gaming power with a high-refresh-rate display, advanced cooling, and a powerful NVIDIA GeForce RTX graphics card.",
+            features: ["165Hz / QHD Display", "RTX 4070 / Graphics", "Intel® Core™ i9 / Processor", "Tempest / Cooling"],
+            type: 'laptop'
+        },
+        'pavilion-15': {
+            name: "HP Pavilion 15\"",
+            price: 799.99,
+            image: "https://placehold.co/800x500/0096D6/FFFFFF?text=Pavilion+15",
+            description: "All-around performance for work, school, and play, featuring a vibrant micro-edge display and long battery life.",
+            features: ["15.6\" / FHD Display", "8 hrs / Battery Life", "AMD Ryzen™ 5 / Processor", "16 GB / RAM"],
+            type: 'laptop'
+        },
+        // Desktops
+        'envy-desktop': {
+            name: "HP Envy Desktop TE02",
+            price: 1199.99,
+            image: "https://placehold.co/800x500/f0f0f0/333333?text=Envy+Desktop+TE02",
+            description: "Unleash powerful performance for demanding creative tasks with a sleek, modern design and advanced thermal management.",
+            features: ["AMD Ryzen™ 7 / Processor", "32 GB / RAM", "RTX 4060 / Graphics", "1 TB SSD / Storage"],
+            type: 'desktop'
+        },
+        'omen-tower': {
+            name: "OMEN 40L Gaming Tower",
+            price: 2199.99,
+            image: "https://placehold.co/800x500/000000/FF0000?text=OMEN+40L+Tower",
+            description: "The ultimate gaming PC with cutting-edge components, tool-less access, and customizable RGB lighting.",
+            features: ["Intel® Core™ i9 / Processor", "32 GB / RAM", "RTX 4070 Ti / Graphics", "OMEN / Cryo Chamber"],
+            type: 'desktop'
+        },
+        'aio-27': {
+            name: "HP All-in-One 27\"",
+            price: 949.99,
+            image: "https://placehold.co/800x500/EEEEEE/000000?text=HP+All-in-One+27",
+            description: "A sleek, space-saving design with a vibrant touch display. Perfect for the modern home office.",
+            features: ["27\" FHD / Touchscreen", "Intel® Core™ i7 / Processor", "16 GB / RAM", "Wireless / Keyboard & Mouse"],
+            type: 'desktop'
+        },
+        // Printers
+        'officejet-9020': {
+            name: "OfficeJet Pro 9020",
+            price: 429.99,
+            image: "https://placehold.co/800x500/666666/FFFFFF?text=OfficeJet+Pro+9020",
+            description: "Fast, professional-quality color for your business. Features dual 250-sheet paper trays and Instant Ink readiness.",
+            features: ["Print, Scan, Copy / All-in-One", "24 ppm / Black", "20 ppm / Color", "Instant Ink / Ready"],
+            type: 'printer'
+        },
+        'laserjet-pro': {
+            name: "LaserJet Pro 4001n",
+            price: 299.99,
+            image: "https://placehold.co/800x500/333333/FFFFFF?text=LaserJet+Pro+4001",
+            description: "High-speed monochrome laser printing for workgroups. Blazing-fast two-sided printing and easy management.",
+            features: ["Monochrome / Laser", "42 ppm / Black", "Network / Ready", "HP Wolf Pro / Security"],
+            type: 'printer'
+        },
+        'envy-inspire': {
+            name: "Envy Inspire 7955e",
+            price: 229.99,
+            image: "https://placehold.co/800x500/8A7967/FFFFFF?text=Envy+Inspire+7955e",
+            description: "Perfect all-in-one for home, photos, and creative projects. Includes 6 months of Instant Ink with HP+.",
+            features: ["Print, Scan, Copy / All-in-One", "True-to-life / Photos", "Auto / Document Feeder", "HP+ / Smart Printing"],
+            type: 'printer'
+        }
+    };
+
+    let state = {
+        isAuthenticated: false,
+        currentPage: 'login', // Default to login
+        cart: [],
+        // NEW: State for the dynamic product page
+        currentProductName: '',
+        currentProductBasePrice: 0,
+        currentProductType: 'laptop',
+        currentProductConfig: {
+            color: { value: 'Nightfall Black', price: 0 },
+            ram: { value: '16GB', price: 0 },
+            storage: { value: '512GB', price: 0 }
+        },
+        checkoutData: {
+            shipping: {},
+            payment: {}
+        }
+    };
+
+    // --- Utility Functions ---
+
+    /**
+     * Shows a temporary, styled message box.
+     * @param {string} message - The message to display.
+     * @param {string} type - 'success', 'error', or 'info'.
+     */
+    function showMessage(message, type = 'info') {
+        const box = document.getElementById('message-box');
+        let bgColor = 'bg-gray-800';
+        if (type === 'success') bgColor = 'bg-green-600';
+        if (type === 'error') bgColor = 'bg-red-600';
+
+        box.textContent = message;
+        box.className = `fixed top-20 right-4 p-4 rounded-lg shadow-lg text-white transition-opacity duration-300 z-[60] ${bgColor} opacity-100`;
+
+        setTimeout(() => {
+            box.classList.remove('opacity-100');
+            box.classList.add('opacity-0');
+        }, 3000);
+    }
+
+    /**
+     * Format number to US currency string.
+     * @param {number} amount
+     */
+    const formatCurrency = (amount) => {
+        return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    };
+
+    // Toggle profile menu
+    function toggleProfileMenu() {
+        const menu = document.getElementById('profile-menu');
+        menu.classList.toggle('hidden');
+    }
+
+    // Close dropdown if clicking outside
+    window.addEventListener('click', function(e) {
+        if (!document.getElementById('profile-dropdown')?.contains(e.target)) {
+            document.getElementById('profile-menu').classList.add('hidden');
+        }
+    });
+
+    // Update header icons based on auth state
+    function updateHeaderUI() {
+        const loginBtn = document.getElementById('login-button');
+        const profileDropdown = document.getElementById('profile-dropdown');
+
+        if (state.isAuthenticated) {
+            loginBtn.classList.add('hidden');
+            profileDropdown.classList.remove('hidden');
+            document.getElementById('profile-email').textContent = USERNAME;
+        } else {
+            loginBtn.classList.remove('hidden');
+            profileDropdown.classList.add('hidden');
+        }
+    }
+
+    // --- Core Navigation Logic ---
+
+    /**
+     * Navigates between pages using opacity transitions.
+     * @param {string} nextPage - The ID suffix of the page to navigate to (e.g., 'home', 'cart').
+     * @param {boolean} clearCart - Optionally clear cart when navigating (used for confirmation page).
+     */
+    function navigate(nextPage, clearCart = false) {
+        if (clearCart) {
+            state.cart = [];
+            updateCartUI(); // Ensures cart UI updates on clear
+        }
+        const pages = document.querySelectorAll('.page-transition');
+
+        pages.forEach(page => {
+            page.classList.add('opacity-0');
+            page.classList.add('hidden');
+        });
+
+        // Delay showing the next page to allow for transition effect
+        setTimeout(() => {
+            const targetPage = document.getElementById(nextPage + '-page');
+            if (targetPage) {
+                // Hide the header/footer if on the login page
+                const header = document.querySelector('header');
+                const footer = document.querySelector('footer');
+                if (nextPage === 'login') {
+                    header.classList.add('hidden');
+                    footer.classList.add('hidden');
+                } else {
+                    header.classList.remove('hidden');
+                    footer.classList.remove('hidden');
+                }
+
+
+                targetPage.classList.remove('hidden');
+                // Force reflow to ensure transition works
+                void targetPage.offsetWidth;
+                targetPage.classList.remove('opacity-0');
+                state.currentPage = nextPage;
+                if (nextPage === 'cart' || nextPage === 'checkout') {
+                    updateCartUI(); // Use updateCartUI to refresh summary
+                }
+            }
+
+        }, 50);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // --- Authentication Logic ---
+
+    function login(e) {
+        e.preventDefault();
+        const usernameInput = document.getElementById('login-username').value;
+        const passwordInput = document.getElementById('login-password').value;
+
+        if (usernameInput === USERNAME && passwordInput === PASSWORD) {
+            state.isAuthenticated = true;
+            updateHeaderUI();
+            showMessage('Login successful! Welcome to HP.', 'success');
+            navigate('home');
+        } else {
+            showMessage('Invalid username or password.', 'error');
+        }
+    }
+
+    function logout(event) {
+        event.preventDefault();
+        state.isAuthenticated = false;
+        state.cart = []; // Also clear cart on logout
+        updateCartUI();
+        updateHeaderUI();
+        navigate('login');
+        showMessage('You have been logged out.', 'info');
+    }
+
+
+    // --- NEW: Product Page Loader ---
+
+    /**
+     * Loads a product's data into the product page and navigates to it.
+     * @param {string} productId - The key from the allProducts object.
+     */
+    function loadProductPage(productId) {
+        const product = allProducts[productId];
+        if (!product) {
+            console.error("Product not found:", productId);
+            return;
+        }
+
+        // Store product details in global state
+        state.currentProductName = product.name;
+        state.currentProductBasePrice = product.price;
+        state.currentProductType = product.type;
+
+        // Update product page DOM
+        document.getElementById('product-image').src = product.image;
+        document.getElementById('product-image').alt = product.name;
+        document.getElementById('product-name').textContent = product.name;
+        document.getElementById('product-description').textContent = product.description;
+
+        // Update features
+        const featuresContainer = document.getElementById('product-features-container');
+        featuresContainer.innerHTML = ''; // Clear old features
+        product.features.forEach(feature => {
+            const featureEl = document.createElement('div');
+            featureEl.className = 'p-2';
+            // Split feature into "Title" and "Subtitle"
+            const parts = feature.split('/');
+            featureEl.innerHTML = `
+                <p class="font-bold text-lg text-hp-blue">${parts[0].trim()}</p>
+                <p class="text-xs text-gray-500">${parts[1] ? parts[1].trim() : '&nbsp;'}</p>
+            `;
+            featuresContainer.appendChild(featureEl);
+        });
+
+        // Show/Hide config options
+        const configSection = document.getElementById('product-config-section');
+        if (product.type === 'laptop' || product.type === 'desktop') {
+            configSection.classList.remove('hidden');
+            resetProductConfiguration(); // Reset options for new product
+        } else {
+            configSection.classList.add('hidden');
+        }
+
+        // Update price and navigate
+        updateProductPrice(); // Update price display
+        navigate('product');
+    }
+
+    // --- Product Configuration Logic (Modified) ---
+
+    function updateProductConfiguration(option, value, price) {
+        const priceValue = parseFloat(price);
+        state.currentProductConfig[option] = { value, price: priceValue };
+        updateProductPrice();
+
+        // Update button styles for selection feedback
+        document.querySelectorAll(`.config-btn[data-option="${option}"]`).forEach(btn => {
+            btn.classList.remove('border-hp-blue', 'border-2', 'ring-2', 'ring-hp-blue');
+            btn.classList.add('border-gray-300');
+        });
+
+        const selectedBtn = document.querySelector(`.config-btn[data-option="${option}"][data-value="${value}"]`);
+        selectedBtn.classList.remove('border-gray-300');
+        selectedBtn.classList.add('border-hp-blue', 'border-2', 'ring-2', 'ring-hp-blue');
+    }
+
+    function updateProductPrice() {
+        // Start with the dynamic base price from the state
+        let total = state.currentProductBasePrice;
+
+        // Only add config prices if the product is configurable
+        if (state.currentProductType === 'laptop' || state.currentProductType === 'desktop') {
+            for (const key in state.currentProductConfig) {
+                total += state.currentProductConfig[key].price;
+            }
+        }
+        document.getElementById('final-price').textContent = formatCurrency(total);
+    }
+
+    function resetProductConfiguration() {
+         state.currentProductConfig = {
+            color: { value: 'Nightfall Black', price: 0 },
+            ram: { value: '16GB', price: 0 },
+            storage: { value: '512GB', price: 0 }
+        };
+        // Re-apply default styles to the first option of each group
+        document.querySelectorAll('.config-btn').forEach(btn => {
+            btn.classList.remove('border-hp-blue', 'ring-2');
+            btn.classList.add('border-gray-300');
+        });
+        document.querySelectorAll(`.config-btn[data-value="Nightfall Black"]`).forEach(btn => btn.classList.add('border-hp-blue', 'ring-2'));
+        document.querySelectorAll(`.config-btn[data-value="16GB"]`).forEach(btn => btn.classList.add('border-hp-blue', 'ring-2'));
+        document.querySelectorAll(`.config-btn[data-value="512GB"]`).forEach(btn => btn.classList.add('border-hp-blue', 'ring-2'));
+        updateProductPrice(); // Update price based on new base price
+    }
+
+    // --- Cart Logic (Modified) ---
+
+    function addToCart() {
+        // Create a unique item object based on current product state
+        const item = {
+            id: Date.now(), // Simple unique ID
+            name: state.currentProductName,
+            basePrice: state.currentProductBasePrice,
+            config: {...state.currentProductConfig}, // Deep copy of config
+            quantity: 1,
+            type: state.currentProductType, // Store type to know how to render it
+            image: allProducts[state.currentProductName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+$/, '')]?.image || 'https://placehold.co/100x70/gray/white?text=Item' // Find image from DB
+        };
+
+        let itemTotal = item.basePrice;
+        // Only add config prices if it's a configurable item
+        if (item.type === 'laptop' || item.type === 'desktop') {
+            for (const key in item.config) {
+                itemTotal += item.config[key].price;
+            }
+        }
+        item.total = itemTotal;
+
+        state.cart.push(item);
+        updateCartUI();
+        showMessage('Item added to cart!', 'success');
+        navigate('cart');
+    }
+
+    function updateQuantity(itemId, change) {
+        const itemIndex = state.cart.findIndex(item => item.id === itemId);
+        if (itemIndex > -1) {
+            state.cart[itemIndex].quantity += change;
+            if (state.cart[itemIndex].quantity <= 0) {
+                state.cart.splice(itemIndex, 1); // Remove item if quantity is zero
+            }
+            updateCartUI();
+        }
+    }
+
+    function removeCartItem(itemId) {
+        state.cart = state.cart.filter(item => item.id !== itemId);
+        updateCartUI();
+    }
+
+    function calculateCartTotals() {
+        const subtotal = state.cart.reduce((sum, item) => sum + (item.total * item.quantity), 0);
+        const tax = subtotal * TAX_RATE;
+        const total = subtotal + tax;
+        return { subtotal, tax, total };
+    }
+
+    function updateCartUI() {
+        const { subtotal, tax, total } = calculateCartTotals();
+        const list = document.getElementById('cart-items-list');
+        list.innerHTML = '';
+
+        // Update global cart count
+        const cartCountEl = document.getElementById('cart-count');
+        const totalQuantity = state.cart.reduce((sum, item) => sum + item.quantity, 0);
+        cartCountEl.textContent = totalQuantity;
+        cartCountEl.classList.toggle('opacity-0', totalQuantity === 0);
+
+        // Update cart visibility
+        const cartContent = document.getElementById('cart-content');
+        const cartEmptyState = document.getElementById('cart-empty-state');
+
+        if (state.cart.length === 0) {
+            cartContent.classList.add('hidden');
+            cartEmptyState.classList.remove('hidden');
+        } else {
+            cartContent.classList.remove('hidden');
+            cartEmptyState.classList.add('hidden');
+
+            // Populate Cart Items List
+            state.cart.forEach(item => {
+                // Show config details only for configurable items
+                let configText = 'Standard Configuration';
+                if (item.type === 'laptop' || item.type === 'desktop') {
+                    configText = Object.values(item.config).map(c => c.value).join(' / ');
+                }
+
+                const itemElement = document.createElement('div');
+                itemElement.className = 'flex flex-col md:flex-row bg-white p-4 rounded-xl shadow-lg items-center space-y-4 md:space-y-0 md:space-x-4';
+                itemElement.innerHTML = `
+                    <img src="${item.image}" class="w-24 h-auto rounded-lg object-contain" alt="${item.name}">
+                    <div class="flex-grow">
+                        <h4 class="font-bold text-hp-dark">${item.name}</h4>
+                        <p class="text-xs text-gray-500 mb-2">${configText}</p>
+                        <p class="font-semibold text-hp-blue">${formatCurrency(item.total)}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="updateQuantity(${item.id}, -1)" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition text-lg">-</button>
+                        <span class="text-lg font-medium w-6 text-center">${item.quantity}</span>
+                        <button onclick="updateQuantity(${item.id}, 1)" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 transition text-lg">+</button>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-bold text-lg text-hp-dark">${formatCurrency(item.total * item.quantity)}</p>
+                        <button onclick="removeCartItem(${item.id})" class="text-xs text-red-500 hover:text-red-700 transition">Remove</button>
+                    </div>
+                `;
+                list.appendChild(itemElement);
+            });
+        }
+
+        // Update Summary Totals (used in Cart and Review pages)
+        document.getElementById('summary-subtotal').textContent = formatCurrency(subtotal);
+        document.getElementById('summary-tax').textContent = formatCurrency(tax);
+        document.getElementById('summary-total').textContent = formatCurrency(total);
+
+        document.getElementById('review-subtotal').textContent = formatCurrency(subtotal);
+        document.getElementById('review-tax').textContent = formatCurrency(tax);
+        document.getElementById('review-total').textContent = formatCurrency(total);
+    }
+
+    // --- Checkout Logic ---
+
+    function startCheckout() {
+         if (state.cart.length === 0) {
+            showMessage('Your cart is empty. Please add an item before checking out.', 'error');
+            return;
+        }
+        navigate('checkout');
+        changeCheckoutStep('shipping');
+    }
+
+    function changeCheckoutStep(step) {
+        const steps = ['shipping', 'payment', 'review'];
+
+        steps.forEach(s => {
+            document.getElementById(`checkout-${s}`).classList.add('hidden');
+            document.getElementById(`step-${s}-btn`).classList.remove('text-hp-blue', 'font-bold');
+            document.getElementById(`step-${s}-btn`).classList.add('text-gray-400');
+        });
+
+        document.getElementById(`checkout-${step}`).classList.remove('hidden');
+        document.getElementById(`step-${step}-btn`).classList.add('text-hp-blue', 'font-bold');
+        document.getElementById(`step-${step}-btn`).classList.remove('text-gray-400');
+    }
+
+    document.getElementById('shipping-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Capture shipping data
+        state.checkoutData.shipping = {
+            name: document.getElementById('ship-name').value,
+            email: document.getElementById('ship-email').value,
+            phone: document.getElementById('ship-phone').value,
+            address1: document.getElementById('ship-address1').value,
+            address2: document.getElementById('ship-address2').value,
+            city: document.getElementById('ship-city').value,
+            state: document.getElementById('ship-state').value,
+            zip: document.getElementById('ship-zip').value
+        };
+
+        changeCheckoutStep('payment');
+    });
+
+    document.getElementById('payment-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Capture payment data (simulated)
+        const cardNumber = document.getElementById('card-number').value;
+        const lastFour = cardNumber.substring(cardNumber.length - 4);
+        const cardType = (cardNumber.startsWith('4') ? 'Visa' : 'Mastercard'); // Simple guess
+
+        state.checkoutData.payment = {
+            cardType: cardType,
+            lastFour: lastFour,
+            expiry: document.getElementById('card-expiry').value,
+            name: document.getElementById('card-name').value
+        };
+
+        populateReviewPage();
+        changeCheckoutStep('review');
+    });
+
+    function populateReviewPage() {
+        const shipping = state.checkoutData.shipping;
+        const payment = state.checkoutData.payment;
+
+        // Shipping Details
+        document.getElementById('review-shipping-details').innerHTML = `
+            <p>${shipping.name}</p>
+            <p>${shipping.address1}${shipping.address2 ? ', ' + shipping.address2 : ''}</p>
+            <p>${shipping.city}, ${shipping.state} ${shipping.zip}, US</p>
+            <p>${shipping.email}</p>
+        `;
+
+        // Payment Details
+        document.getElementById('review-payment-details').textContent =
+            `${payment.cardType} ending in ${payment.lastFour}`;
+
+        // Items List
+        const reviewList = document.getElementById('review-items-list');
+        reviewList.innerHTML = '';
+
+        state.cart.forEach(item => {
+            let configText = 'Standard Configuration';
+            if (item.type === 'laptop' || item.type === 'desktop') {
+                configText = Object.values(item.config).map(c => c.value).join(' / ');
+            }
+
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'flex justify-between border-b pb-2';
+            itemDiv.innerHTML = `
+                <div class="flex-grow pr-2">
+                    <p class="font-medium">${item.name} (x${item.quantity})</p>
+                    <p class="text-xs text-gray-500">${configText}</p>
+                </div>
+                <p class="font-semibold text-hp-dark">${formatCurrency(item.total * item.quantity)}</p>
+            `;
+            reviewList.appendChild(itemDiv);
+        });
+
+        // Totals are already updated by updateCartUI()
+    }
+
+    function submitOrder() {
+        // Simulate API call and success response
+        const orderId = 'HP-US-' + Math.floor(Math.random() * 10000000);
+        document.getElementById('order-number').textContent = orderId;
+
+        // Clear checkout data for next transaction
+        state.checkoutData = { shipping: {}, payment: {} };
+
+        navigate('confirmation', true); // Navigate and clear cart
+        showMessage('Order submitted! Your confirmation is on the way.', 'success');
+    }
+
+    // --- Event Listeners and Initialization ---
+
+    window.onload = function() {
+        // Initialize event listeners for configuration buttons
+        document.getElementById('product-config-section').addEventListener('click', function(e) {
+            const target = e.target.closest('.config-btn');
+            if (target) {
+                const option = target.dataset.option;
+                const value = target.dataset.value;
+                const price = target.dataset.price;
+                updateProductConfiguration(option, value, price);
+            }
+        });
+
+        // Initialize the UI state
+        updateCartUI();
+
+        // Handle card expiry formatting (MM/YY)
+        document.getElementById('card-expiry').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // Add listener for the login form
+        document.getElementById('login-form').addEventListener('submit', login);
+
+        // Update header UI based on initial auth state
+        updateHeaderUI();
+
+        // Start on the login page
+        navigate('login');
+    };
+</script>
+</body>
+</html>
